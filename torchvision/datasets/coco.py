@@ -1,6 +1,6 @@
 import os.path
 from typing import Any, Callable, Optional, Tuple, List
-
+import cv2
 from PIL import Image
 
 from .vision import VisionDataset
@@ -38,7 +38,10 @@ class CocoDetection(VisionDataset):
 
     def _load_image(self, id: int) -> Image.Image:
         path = self.coco.loadImgs(id)[0]["file_name"]
-        return Image.open(os.path.join(self.root, path)).convert("RGB")
+        try:
+            return Image.open(os.path.join(self.root, path)).convert("RGB")
+        except:
+            return Image.fromarray(cv2.imread(os.path.join(self.root, path))).convert("RGB")
 
     def _load_target(self, id: int) -> List[Any]:
         return self.coco.loadAnns(self.coco.getAnnIds(id))
